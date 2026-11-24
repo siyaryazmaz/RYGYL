@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RYGYL - Driving Theory Test</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101827;
+  color: white;
+}
+header {
+  text-align: center;
+  padding: 25px 15px;
+  background: #17243a;
+}
+.logo { font-size: 32px; font-weight: bold; color: #45d6a0; }
+header p { color: #cbd5e1; }
+main {
+  max-width: 550px;
+  margin: 25px auto;
+  padding: 15px;
+}
+.card {
+  background: #202e43;
+  padding: 22px;
+  border-radius: 16px;
+}
+h2 { color: #45d6a0; }
+.question { font-size: 19px; line-height: 1.5; }
+.turkish {
+  color: #facc75;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.option {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 15px;
+  border: 1px solid #53647b;
+  border-radius: 10px;
+  background: #293b54;
+  color: white;
+  text-align: left;
+  font-size: 16px;
+}
+.option:disabled { opacity: 0.8; }
+button { cursor: pointer; }
+.option.correct { background: #176b4c; }
+.option.wrong { background: #923c45; }
+#feedback { margin-top: 18px; line-height: 1.5; }
+.next {
+  width: 100%;
+  padding: 15px;
+  background: #45d6a0;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+.progress { color: #aabbd0; }
+footer { text-align: center; color: #aabbd0; padding: 25px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">RYGYL</div>
+  <p>Relax, You'll Get Your Licence</p>
+  <p>UK Driving Theory Test</p>
+</header>
+
+<main>
+<div class="card">
+  <p class="progress" id="progress"></p>
+  <h2>Practice Test</h2>
+  <p class="question" id="question"></p>
+  <p class="turkish" id="translation"></p>
+  <div id="answers"></div>
+  <div id="feedback"></div>
+  <button class="next" id="next" onclick="nextQuestion()" hidden>
+    Next Question →
+  </button>
+</div>
+</main>
+
+<footer>RYGYL © 2026 | Learn. Practise. Pass.</footer>
+
+<script>
+const questions = [
+{
+q:"What should you do when approaching a red traffic light?",
+tr:"Kırmızı trafik ışığına yaklaşırken ne yapmalısınız?",
+a:["Stop","Speed up","Sound your horn","Turn left"],
+t:["Durmalısınız","Hızlanmalısınız","Korna çalmalısınız","Sola dönmelisiniz"],
+correct:0,
+ex:"A red traffic light means you must stop."
+},
+{
+q:"When should you wear a seat belt?",
+tr:"Ne zaman emniyet kemeri takmalısınız?",
+a:["Only on motorways","Only at night","Whenever required in a vehicle","Only on long journeys"],
+t:["Sadece otoyollarda","Sadece geceleri","Araçta gerekli olduğu her zaman","Sadece uzun yolculuklarda"],
+correct:2,
+ex:"Seat belts must be worn when required by law."
+},
+{
+q:"What should you do before changing lanes?",
+tr:"Şerit değiştirmeden önce ne yapmalısınız?",
+a:["Check mirrors and blind spots","Accelerate immediately","Only look ahead","Sound your horn"],
+t:["Aynaları ve kör noktaları kontrol etmelisiniz","Hemen hızlanmalısınız","Sadece ileri bakmalısınız","Korna çalmalısınız"],
+correct:0,
+ex:"Check your mirrors and blind spots before moving."
+}
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+function showQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById("progress").textContent =
+    "Question " + (current+1) + " / " + questions.length;
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("translation").textContent = q.tr;
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("next").hidden = true;
+  const area = document.getElementById("answers");
+  area.innerHTML = "";
+  q.a.forEach((answer,i) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.innerHTML = answer + "<br><small>" + q.t[i] + "</small>";
+    btn.onclick = () => checkAnswer(i,btn);
+    area.appendChild(btn);
+  });
+}
+
+function checkAnswer(i,btn) {
+  if(answered) return;
+  answered = true;
+  const q = questions[current];
+  const buttons = document.querySelectorAll(".option");
+  buttons.forEach((b,index) => {
+    b.disabled = true;
+    if(index === q.correct) b.classList.add("correct");
+  });
+  if(i === q.correct) {
+    score++;
+    document.getElementById("feedback").textContent =
+      "Correct! ✓ " + q.ex;
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("feedback").textContent =
+      "Incorrect. The correct answer is: " + q.a[q.correct] +
+      ". " + q.ex;
+  }
+  document.getElementById("next").hidden = false;
+}
+
+function nextQuestion() {
+  current++;
+  if(current < questions.length) {
+    showQuestion();
+  } else {
+    document.querySelector(".card").innerHTML =
+      "<h2>Test completed!</h2>" +
+      "<p>Test tamamlandı!</p>" +
+      "<h1>" + score + " / " + questions.length + "</h1>" +
+      "<p>Your score / Puanın</p>" +
+      '<button class="next" onclick="location.reload()">Try Again / Tekrar Dene</button>';
+  }
+}
+
+showQuestion();
+</script>
+</body>
+</html>
